@@ -1,29 +1,28 @@
 let ppm = 0
+let ppmTarget = 444
+let difference = 0
 
 const fetchLastPpms = async () => {
-  let res = await fetch('https://global-warming.org/api/co2-api')
-    .then(data => {
-      return data.json()
+  return await fetch('https://global-warming.org/api/co2-api')
+    .then(async   rawdata => {
+      let data = await rawdata.json()
+      
+      return Number(data.co2[data.co2.length - 1].cycle)
     })
-
-  return Number(res.co2[res.co2.length - 1].cycle)
 }
 
 function preload() {
-  let ppm = fetchLastPpms()
-  let ppmTarget = 444
-  let difference = ppmTarget - ppm
-
+  
   img = loadImage('https://upload.wikimedia.org/wikipedia/commons/e/e3/They_did_it%21_%2823692333176%29.jpg');
 }
 
 async function setup() {
   createCanvas(img.width, img.height)
-
   ppm = await fetchLastPpms()
-
-  console.log(ppm)
-  console.log(difference)
+  difference = ppmTarget - ppm
+  console.log('ppm', ppm)
+  console.log('ppmTarget', ppmTarget)
+  console.log('difference', difference)
   img.loadPixels();
   loadPixels();
   for (let y = 1; y < height; y++) {
