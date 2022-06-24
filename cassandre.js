@@ -2,9 +2,15 @@ let ppm = 0
 let ppmStart = 404.81
 let ppmTarget = 444
 let difference = 0
+let fxPercentCompletion = 0
+let pxLimit = 0
 
-const percentScaling = (min, max, curr) => {
+const computeFxPercentCompletion = (min, max, curr) => {
   return 100 * (curr - min) / (max - min)
+}
+
+const currentPpmToHeight = (fxPercentCompletion) => {
+  return (fxPercentCompletion / 100) * img.height
 }
 
 const fetchLastPpms = async () => {
@@ -24,13 +30,18 @@ function preload() {
 async function setup() {
   createCanvas(img.width, img.height)
   await fetchLastPpms()
-  setInterval(async () => { ppm = await fetchLastPpms() }, 86400)
+  setInterval(async () => { await fetchLastPpms() }, 86400)
   difference = ppmTarget - ppm
+  fxPercentCompletion = computeFxPercentCompletion(ppmStart, ppmTarget, ppm)
+  console.log('fxPercentCompletion', fxPercentCompletion)
+  pxLimit = currentPpmToHeight(fxPercentCompletion)
+  console.log('pxLimit', pxLimit)
   console.log('ppm', ppm)
   console.log('ppmStart', ppmStart)
   console.log('ppmTarget', ppmTarget)
   console.log('difference', difference)
   img.loadPixels();
+
   loadPixels();
   for (let y = 1; y < height; y++) {
     for (let x = 0; x < width; x++) {
@@ -43,21 +54,17 @@ async function setup() {
     }
   }
 
-  console.log('ppmPercentScaling', percentScaling(ppmStart, ppmTarget, ppm))
-  console.log('heightPercentScaling', percentScaling(0, img.height, 33.4))
-
   updatePixels();
 }
 
-
-const sortPixels = (pixels, height, isStartingAt0) => {
-  for (let y = height; y > (isStartingAt0 ? 1 : 1); y--) {
+const sortPixels = (offset, pixels, pxLimit) => {
+  for (let y = height; y > 1; y--) {
     for (let x = 0; x < width; x++) {
       let i = (x + y * width) * 4;
-
+      
       if (pixels[i] + pixels[i + 1] + pixels[i + 2] > (pixels[i - width * 4] + pixels[i + 1 - width * 4] + pixels[i + 2 - width * 4])) {
         let temp = [pixels[i], pixels[i + 1], pixels[i + 2], pixels[i + 3]]
-
+        
         pixels[i] = pixels[i - width * 4]
         pixels[i + 1] = pixels[i + 1 - width * 4]
         pixels[i + 2] = pixels[i + 2 - width * 4]
@@ -69,11 +76,9 @@ const sortPixels = (pixels, height, isStartingAt0) => {
       }
     }
   }
-} 
+  updatePixels();
+}
 
 function draw() {
-  console.log(ppm)
-  sortPixels(pixels, height)
-  updatePixels();
-
+  sortPixels(300, pixels, pxLimit)
 }
