@@ -3,8 +3,8 @@ let ppmStart = 404.81
 let ppmTarget = 444
 let difference = 0
 
-const percentCompletion = () => {
-  return 100 * (ppm - ppmStart) / (ppmTarget - ppmStart)
+const percentScaling = (min, max, curr) => {
+  return 100 * (curr - min) / (max - min)
 }
 
 const fetchLastPpms = async () => {
@@ -30,7 +30,6 @@ async function setup() {
   console.log('ppmStart', ppmStart)
   console.log('ppmTarget', ppmTarget)
   console.log('difference', difference)
-  console.log('percentCompletion', percentCompletion())
   img.loadPixels();
   loadPixels();
   for (let y = 1; y < height; y++) {
@@ -43,12 +42,16 @@ async function setup() {
       pixels[i + 3] = 255;
     }
   }
+
+  console.log('ppmPercentScaling', percentScaling(ppmStart, ppmTarget, ppm))
+  console.log('heightPercentScaling', percentScaling(0, img.height, 33.4))
+
   updatePixels();
 }
 
-function draw() {
-  console.log(ppm)
-  for (let y = height; y > 1; y--) {
+
+const sortPixels = (pixels, height, isStartingAt0) => {
+  for (let y = height; y > (isStartingAt0 ? 1 : 1); y--) {
     for (let x = 0; x < width; x++) {
       let i = (x + y * width) * 4;
 
@@ -66,6 +69,11 @@ function draw() {
       }
     }
   }
+} 
+
+function draw() {
+  console.log(ppm)
+  sortPixels(pixels, height)
   updatePixels();
 
 }
