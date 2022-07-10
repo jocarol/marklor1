@@ -4,6 +4,7 @@ let ppmTarget = 444
 let difference = 0
 let fxPercentCompletion = 0
 let pxLimit = 0
+let i = 0
 
 const computeFxPercentCompletion = (min, max, curr) => {
   return 100 * (curr - min) / (max - min)
@@ -21,10 +22,13 @@ const fetchLastPpms = async () => {
       console.log('fetched last ppm value: ', data.co2[data.co2.length - 1].cycle)
       return Number(data.co2[data.co2.length - 1].cycle)
     })
+    loop()
 }
 
 function preload() {
-  img = loadImage('https://upload.wikimedia.org/wikipedia/commons/e/e3/They_did_it%21_%2823692333176%29.jpg');
+  // img = loadImage('https://upload.wikimedia.org/wikipedia/commons/e/e3/They_did_it%21_%2823692333176%29.jpg');
+  // img = loadImage('https://images.axa-contento-118412.eu/www-axa-com/a2157bbb-744b-4cf1-8781-54e687c9a8a8_unclimate1200628.jpg');
+  img = loadImage('https://live.staticflickr.com/762/23705940645_71b57e8a56_b.jpg');
 }
 
 async function setup() {
@@ -59,6 +63,8 @@ async function setup() {
 
 const sortPixels = (offset, pixels, pxLimit) => {
   for (let y = height; y > 1; y--) {
+  //   if (y < pxLimit)
+  //     break
     for (let x = 0; x < width; x++) {
       let i = (x + y * width) * 4;
       
@@ -80,5 +86,9 @@ const sortPixels = (offset, pixels, pxLimit) => {
 }
 
 function draw() {
+  if (pxLimit === 0)
+    return
+  if (++i > img.height || i > pxLimit)
+    noLoop()
   sortPixels(300, pixels, pxLimit)
 }
