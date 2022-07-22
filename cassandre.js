@@ -22,7 +22,7 @@ const fetchLastPpms = async () => {
       console.log('fetched last ppm value: ', data.co2[data.co2.length - 1].cycle)
       return Number(data.co2[data.co2.length - 1].cycle)
     })
-    loop()
+  // loop()
 }
 
 function preload() {
@@ -61,16 +61,14 @@ async function setup() {
   updatePixels();
 }
 
-const sortPixels = (offset, pixels, pxLimit) => {
+const sortPixels = (pixels) => {
   for (let y = height; y > 1; y--) {
-  //   if (y < pxLimit)
-  //     break
     for (let x = 0; x < width; x++) {
       let i = (x + y * width) * 4;
-      
-      if (pixels[i] + pixels[i + 1] + pixels[i + 2] > (pixels[i - width * 4] + pixels[i + 1 - width * 4] + pixels[i + 2 - width * 4])) {
+
+      if (pixels[i] + pixels[i + 1] + pixels[i + 2] > (pixels[i - width * 4] + pixels[i + 2 - width * 4] + pixels[i + 3 - width * 4])) {
         let temp = [pixels[i], pixels[i + 1], pixels[i + 2], pixels[i + 3]]
-        
+
         pixels[i] = pixels[i - width * 4]
         pixels[i + 1] = pixels[i + 1 - width * 4]
         pixels[i + 2] = pixels[i + 2 - width * 4]
@@ -88,7 +86,7 @@ const sortPixels = (offset, pixels, pxLimit) => {
 function draw() {
   if (pxLimit === 0)
     return
-  if (++i > img.height || i > pxLimit)
-    noLoop()
-  sortPixels(300, pixels, pxLimit)
+  // if (++i > img.height || i > pxLimit)
+  // noLoop()
+  sortPixels(pixels)
 }
